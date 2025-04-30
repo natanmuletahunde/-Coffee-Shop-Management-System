@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Health Care Center</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f4f6f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .navbar {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .btn-custom {
+            width: 100%;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 12px;
+        }
+
+        .toggle-button {
+            margin: 10px 5px;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 12px;
+            border: none;
+            color: white;
+        }
+
+        .modal-header {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .card-body ul {
+            padding-left: 20px;
+        }
+
+        .card-body ul li {
+            margin-bottom: 10px;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .modal.fade .modal-dialog {
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .modal.show .modal-dialog {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <div class="logo me-2">
+                    <img src="{{ url_for('static', filename='img.png') }}" alt="Logo">
+                </div>
+                Health Center
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/developer">Developer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/blog">Blog</a></li>
+                </ul>
+                <form class="d-flex ms-3" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Section -->
+    <div class="container">
+        <h1 class="text-center text-success mt-5">Health Care Center</h1>
+
+        <div class="form-container">
+            <form action="/predict" method="post">
+                <div class="mb-3">
+                    <label for="symptoms" class="form-label">Select Symptoms:</label>
+                    <input type="text" class="form-control" id="symptoms" name="symptoms"
+                        placeholder="Type symptoms like itching, sleeping, aching...">
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="button" id="startSpeechRecognition" class="btn btn-success btn-custom">Start Speech Recognition</button>
+                </div>
+
+                <div id="transcription" class="mb-3"></div>
+
+                {% if message %}
+                <div class="alert alert-info">{{ message }}</div>
+                {% endif %}
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-custom">Predict</button>
+                </div>
+            </form>
+        </div>
+
+        {% if predicted_disease %}
+        <!-- Results Section -->
+        <h2 class="text-center my-5">Our AI System Results</h2>
+
+        <div class="result-container">
+            <button class="toggle-button bg-warning" data-bs-toggle="modal" data-bs-target="#diseaseModal">Disease</button>
+            <button class="toggle-button bg-primary" data-bs-toggle="modal" data-bs-target="#descriptionModal">Description</button>
+            <button class="toggle-button bg-info" data-bs-toggle="modal" data-bs-target="#precautionModal">Precaution</button>
+            <button class="toggle-button bg-danger" data-bs-toggle="modal" data-bs-target="#medicationsModal">Medications</button>
+            <button class="toggle-button bg-success" data-bs-toggle="modal" data-bs-target="#workoutsModal">Workouts</button>
+            <button class="toggle-button bg-secondary" data-bs-toggle="modal" data-bs-target="#dietsModal">Diets</button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Modals (No changes to modals) -->
+    <div class="modal fade" id="diseaseModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Predicted Disease</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Disease Information</h5>
+                            <p class="card-text">{{ predicted_disease }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description Modal -->
+    <div class="modal fade" id="descriptionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Disease Description</h5>
+                            <p class="card-text">{{ dis_des }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Precaution Modal -->
+    <div class="modal fade" id="precautionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Precaution</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Precautions</h5>
+                            <ul>
+                                {% for i in my_precautions %}
+                                <li>{{ i }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medications Modal -->
+    <div class="modal fade" id="medicationsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Medications</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Suggested Medications</h5>
+                            <ul>
+                                {% for i in medications %}
+                                <li>{{ i }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workouts Modal -->
+    <div class="modal fade" id="workoutsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Workouts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Suggested Workouts</h5>
+                            <ul>
+                                {% for i in workout %}
+                                <li>{{ i }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diets Modal -->
+    <div class="modal fade" id="dietsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Diets</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Recommended Diets</h5>
+                            <ul>
+                                {% for i in diets %}
+                                <li>{{ i }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
+
+
+
+
+
+<!--use this data to test
+
+<!-- Fungal infection	itching	skin_rash	nodal_skin_eruptions	dischromic _patches
+1	1	  infection	skin_rash	nodal_skin_eruptions	dischromic _patches	NaN
+2	2	Fungal infection	itching	nodal_skin_eruptions	dischromic _patches	NaN
+3	3	Fungal infection	itching	skin_rash	dischromic _patches	NaN
+4	4	Fungal infection	itching	skin_rash	nodal_skin_eruptions	NaN-->
+
+
+<!--(vertigo) Paroymsal Positional Vertigo...	vomiting	headache	nausea	spinning_movements
+4916	4916	Acne	...skin_rash	pus_filled_pimples	blackheads	scurring
+4917	4917	Urinary tract infection	.....burning_micturition	bladder_discomfort	foul_smell_of urine	continuous_feel_of_urine
+4918	4918	Psoriasis....	skin_rash	joint_pain	skin_peeling	silver_like_dusting
+4919	4919	Impetigo....	skin_rash	high_fever	blister	red_sore_around_nose-->
