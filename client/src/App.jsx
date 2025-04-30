@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-ro
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Signup from "./components/SignUp";
-import Login from "./pages/Login"; // Make sure this file exists
+import Login from "./pages/Login";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -21,14 +21,11 @@ function App() {
 
       <main className="p-6">
         <Routes>
-          <Route path="/" element={<Signup />} />
+          <Route path="/" element={<Navigate to={token ? "/home" : "/login"} replace />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/about" element={<About />} />
-          <Route
-            path="/home"
-            element={token ? <Home /> : <Navigate to="/login" replace />}
-          />
+          <Route path="/home" element={token ? <Home /> : <Navigate to="/login" replace />} />
         </Routes>
       </main>
 
