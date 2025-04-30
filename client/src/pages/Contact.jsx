@@ -11,30 +11,35 @@ const Contact = () => {
         email,
         password,
       });
-      alert("Login successful. Token: " + res.data.token);
+      alert("Login successful! Token: " + res.data.token);
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div>
-      <h1>Login to Contact Us</h1>
+    <div className="max-w-md mx-auto bg-white shadow-md rounded p-6">
+      <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">Login</h2>
       <input
         type="email"
         placeholder="Email"
         value={email}
+        className="w-full p-2 border mb-3 rounded"
         onChange={(e) => setEmail(e.target.value)}
-        className="block my-2"
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
+        className="w-full p-2 border mb-4 rounded"
         onChange={(e) => setPassword(e.target.value)}
-        className="block my-2"
       />
-      <button onClick={login}>Login</button>
+      <button
+        onClick={login}
+        className="w-full bg-blue-800 text-white py-2 rounded hover:bg-blue-700 transition"
+      >
+        Login
+      </button>
     </div>
   );
 };
