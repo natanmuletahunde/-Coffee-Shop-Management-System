@@ -1,9 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Contact = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const login = async () => {
     try {
@@ -11,15 +14,18 @@ const Contact = () => {
         email,
         password,
       });
-      alert("Login successful! Token: " + res.data.token);
+
+      localStorage.setItem("token", res.data.token);
+      navigate("/home");
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      setErrorMessage(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
     <div className="max-w-md mx-auto bg-white shadow-md rounded p-6">
       <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">Login</h2>
+
       <input
         type="email"
         placeholder="Email"
@@ -31,9 +37,10 @@ const Contact = () => {
         type="password"
         placeholder="Password"
         value={password}
-        className="w-full p-2 border mb-4 rounded"
+        className="w-full p-2 border mb-3 rounded"
         onChange={(e) => setPassword(e.target.value)}
       />
+      {errorMessage && <div className="text-red-500 mb-3">{errorMessage}</div>}
       <button
         onClick={login}
         className="w-full bg-blue-800 text-white py-2 rounded hover:bg-blue-700 transition"
@@ -44,4 +51,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default Login;
