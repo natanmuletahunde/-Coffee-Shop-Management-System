@@ -3,6 +3,8 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Signup from "./components/SignUp";
 import Login from "./pages/Login";
+import IsAuth from "./isAuth";
+import Logout from "./components/Logout";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -14,18 +16,25 @@ function App() {
         <nav className="space-x-4">
           <Link to="/home" className="hover:text-gray-300">Home</Link>
           <Link to="/about" className="hover:text-gray-300">About</Link>
-          <Link to="/signup" className="hover:text-gray-300">Sign Up</Link>
-          <Link to="/login" className="hover:text-gray-300">Login</Link>
+          {!token && (
+            <>
+              <Link to="/signup" className="hover:text-gray-300">Sign Up</Link>
+              <Link to="/" className="hover:text-gray-300">Login</Link>
+            </>
+          )}
+          <IsAuth>
+            <Logout/>
+          </IsAuth>
         </nav>
       </header>
 
       <main className="p-6">
         <Routes>
-          <Route path="/" element={<Navigate to={token ? "/home" : "/login"} replace />} />
+          {/* <Route path="/" element={<Navigate to={token ? "/home" : "/login"} replace />} /> */}
           <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/about" element={<About />} />
-          <Route path="/home" element={token ? <Home /> : <Navigate to="/login" replace />} />
+          <Route path="/home" element={<IsAuth><Home/></IsAuth>} />
         </Routes>
       </main>
 
